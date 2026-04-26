@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Registro Concimazioni" />
+  <meta name="theme-color" content="#1b5e20" />
+  <title>Registro Concimazioni V11 - ritorno stampa</title>
+  <style>
+    :root {
+      --v-dark: #1b5e20;
+      --v-mid: #388e3c;
+      --v-light: #e8f5e9;
+      --accent: #f57c00;
+      --text: #263238;
+      --danger: #c62828;
+      --muted: #607d8b;
+      --bg: #f4f7f6;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 40px; }
+    .header { background: var(--v-dark); color: white; padding: 18px 15px 14px; text-align: center; }
+    .header h1 { margin: 0; font-size: 22px; }
+    .header p { margin: 4px 0 0; opacity: .9; font-size: 13px; }
+    .nav-tabs { display: flex; gap: 5px; background: white; padding: 8px; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
+    .nav-tabs button { flex: 1; border: none; background: #f5f5f5; padding: 10px 4px; font-weight: 800; color: #777; font-size: 11px; border-radius: 10px; }
+    .nav-tabs button.active { background: var(--v-light); color: var(--v-dark); }
+    .container { padding: 14px; max-width: 720px; margin: auto; }
+    .card { background: var(--card); border-radius: 16px; padding: 17px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 15px; display: none; }
+    .card.active { display: block; }
+    h2, h3 { margin-top: 0; }
+    label { display: block; font-size: 11px; font-weight: 800; color: #666; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: .02em; }
+    select, input, textarea { width: 100%; padding: 13px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 16px; margin-bottom: 9px; background: #fff; }
+    textarea { resize: vertical; min-height: 72px; }
+    .selector-box { border: 1px solid #cfd8dc; border-radius: 12px; max-height: 160px; overflow-y: auto; background: #fff; margin-bottom: 10px; }
+    .selector-item { display: flex; align-items: center; padding: 11px; border-bottom: 1px solid #eee; font-size: 15px; text-transform: none; color: var(--text); margin: 0; letter-spacing: 0; }
+    .selector-item input { width: 22px; height: 22px; margin: 0 12px 0 0; }
+    .area-info { font-weight: 800; color: var(--accent); margin: 8px 0 14px; }
+    .box-soft { background: #f1f8e9; padding: 14px; border-radius: 14px; border: 1px solid #c8e6c9; margin-top: 10px; }
+    .mix-box { background: #fffde7; border: 2px dashed #fbc02d; border-radius: 14px; padding: 12px; margin: 15px 0; }
+    .mix-item, .row-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .mix-item:last-child, .row-item:last-child { border-bottom: 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 14px 0; }
+    .stat-card { background: var(--v-light); padding: 10px 5px; border-radius: 13px; text-align: center; border: 1px solid #c8e6c9; }
+    .stat-card b { display: block; font-size: 17px; color: var(--v-dark); }
+    .stat-card small { color: #455a64; font-weight: 700; }
+    .btn { border: none; padding: 14px; border-radius: 13px; font-weight: 850; width: 100%; cursor: pointer; font-size: 14px; margin: 5px 0; }
+    .btn-primary { background: var(--v-dark); color: white; }
+    .btn-add { background: var(--v-mid); color: white; }
+    .btn-light { background: var(--v-light); color: var(--v-dark); border: 1px solid #c8e6c9; }
+    .btn-danger { background: #ffebee; color: var(--danger); border: 1px solid #ffcdd2; }
+    .btn-small { width: auto; padding: 8px 10px; font-size: 12px; border-radius: 10px; }
+    .history-item { border: 1px solid #eceff1; padding: 14px; border-radius: 14px; margin-bottom: 10px; background: #fff; }
+    .tag { display: inline-block; background: #e1f5fe; color: #0288d1; padding: 5px 8px; border-radius: 8px; font-size: 11px; font-weight: 800; margin: 4px 4px 0 0; }
+    .tag-method { background: #fff3e0; color: #ef6c00; }
+    .empty { color: var(--muted); background: #fafafa; padding: 14px; border-radius: 12px; border: 1px dashed #cfd8dc; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .five { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .notice { background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; }
+    .sync-box { background:#fff; border:1px solid #c8e6c9; border-radius:14px; padding:10px 12px; margin-bottom:12px; display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .sync-dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:#9e9e9e; margin-right:6px; vertical-align:middle; }
+    .sync-dot.ok { background:#2e7d32; }
+    .sync-dot.warn { background:#f57c00; }
+    .sync-dot.err { background:#c62828; }
+    .sync-text { font-size:13px; font-weight:800; color:#455a64; }
+    .danger-text { color: var(--danger); font-weight: 800; }
+    .actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .edit-banner { background:#fff8e1; border:1px solid #ffe082; color:#8a5a00; padding:10px; border-radius:12px; margin:10px 0; font-weight:800; display:none; }
+    .btn-edit { background:#e3f2fd; color:#0d47a1; border:1px solid #bbdefb; }
+    .summary-box { background:#f9fff9; border:1px solid #c8e6c9; border-radius:14px; padding:12px; margin:12px 0 16px; }
+    .summary-title { margin:0 0 8px; color:var(--v-dark); font-size:16px; }
+    .summary-row { border-top:1px solid #e0eee0; padding:10px 0; }
+    .summary-row:first-of-type { border-top:0; }
+    .summary-tags { margin-top:6px; }
+    @media (max-width: 520px) { .stats-grid, .five { grid-template-columns: repeat(2, 1fr); } .header h1 { font-size: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Registro Concimazioni</h1>
+    <p>Interventi, concimi, campi, totali, backup</p>
+  </div>
+
+  <div class="nav-tabs">
+    <button onclick="openTab('tab-new')" id="btn-tab-new" class="active">NUOVO</button>
+    <button onclick="openTab('tab-history')" id="btn-tab-history">REGISTRO</button>
+    <button onclick="openTab('tab-fields')" id="btn-tab-fields">CAMPI</button>
+    <button onclick="openTab('tab-stock')" id="btn-tab-stock">CONCIMI</button>
+    <button onclick="openTab('tab-backup')" id="btn-tab-backup">BACKUP</button>
+  </div>
+
+  <div class="container">
+    <div class="sync-box">
+      <div class="sync-text"><span id="sync-dot" class="sync-dot"></span><span id="sync-status">Sincronizzazione Google: avvio...</span></div>
+      <button class="btn btn-light btn-small" onclick="forzaSincronizzazione()">Sincronizza ora</button>
+    </div>
+    <div id="tab-new" class="card active">
+      <h3>Nuovo intervento</h3>
+      <label>1. Selezione vigneti</label>
+      <div id="list-selezione-vigne" class="selector-box"></div>
+      <div id="tot-area-info" class="area-info">Area: 0 ha</div>
+
+      <label>2. Data intervento</label>
+      <input type="date" id="in-data" />
+
+      <label>3. Metodo di distribuzione</label>
+      <select id="sel-metodo">
+        <option value="Spandiconcime">Spandiconcime</option>
+        <option value="Manichetta">Manichetta</option>
+        <option value="Fertirrigazione">Fertirrigazione</option>
+        <option value="Fogliare">Fogliare</option>
+        <option value="Localizzato">Localizzato</option>
+        <option value="Interramento">Interramento</option>
+        <option value="Pieno campo">Spandimento a pieno campo</option>
+      </select>
+
+      <div class="box-soft">
+        <label>4. Aggiungi prodotto</label>
+        <select id="sel-concime"></select>
+        <input type="number" id="in-kg-tot" placeholder="Quantità totale usata kg" step="0.01" oninput="aggiornaDoseDaKgTotale()" />
+        <input type="number" id="in-dose-ha" placeholder="Dose kg/ha" step="0.01" oninput="aggiornaKgTotaleDaDose()" />
+        <small style="display:block;color:var(--muted);margin:-4px 0 10px;line-height:1.35;">Puoi inserire i kg totali usati: il programma calcola automaticamente i kg/ha in base agli ettari selezionati. Oppure inserisci direttamente kg/ha.</small>
+        <button class="btn btn-add" onclick="aggiungiAMiscela()">Aggiungi alla lista</button>
+      </div>
+
+      <div id="box-miscela" class="mix-box" style="display:none;">
+        <label>Prodotti inseriti</label>
+        <div id="lista-miscela"></div>
+      </div>
+
+      <label>Unità totali / ha</label>
+      <div class="stats-grid">
+        <div class="stat-card"><b id="val-n">0</b><small>N</small></div>
+        <div class="stat-card"><b id="val-p">0</b><small>P</small></div>
+        <div class="stat-card"><b id="val-k">0</b><small>K</small></div>
+        <div class="stat-card"><b id="val-mg">0</b><small>Mg</small></div>
+        <div class="stat-card"><b id="val-ca">0</b><small>Ca</small></div>
+      </div>
+
+      <label>Note</label>
+      <textarea id="in-note" placeholder="Es. meteo, motivo intervento, operatore..."></textarea>
+
+      <div id="edit-intervento-banner" class="edit-banner">Stai modificando un intervento esistente</div>
+      <button id="btn-salva-intervento" class="btn btn-primary" onclick="salvaIntervento()">Salva nel registro</button>
+      <button id="btn-annulla-intervento" class="btn btn-light" onclick="annullaModificaIntervento()" style="display:none;">Annulla modifica</button>
+    </div>
+
+    <div id="tab-history" class="card">
+      <h3>Registro interventi</h3>
+      <button class="btn btn-light" onclick="esportaCSV()">Esporta registro CSV</button>
+      <button class="btn btn-light" onclick="esportaTotaliCampiCSV()">Esporta totali campi CSV</button>
+      <div id="display-totali-campi"></div>
+      <div id="display-registro"></div>
+    </div>
+
+    <div id="tab-fields" class="card">
+      <h3>Gestione campi</h3>
+      <div id="display-vigneti"></div>
+      <label>Nuovo campo</label>
+      <input type="text" id="v-nome" placeholder="Nome vigneto / campo" />
+      <input type="number" id="v-ha" placeholder="Ettari" step="0.01" />
+      <button id="btn-salva-vigneto" class="btn btn-add" onclick="salvaVigneto()">+ Aggiungi campo</button>
+      <button id="btn-annulla-vigneto" class="btn btn-light" onclick="annullaModificaVigneto()" style="display:none;">Annulla modifica</button>
+    </div>
+
+    <div id="tab-stock" class="card">
+      <h3>Magazzino concimi</h3>
+      <div id="display-concimi"></div>
+      <label>Nuovo concime</label>
+      <input type="text" id="c-nome" placeholder="Nome concime" />
+      <div class="five">
+        <input type="number" id="c-n" placeholder="N%" step="0.01" />
+        <input type="number" id="c-p" placeholder="P%" step="0.01" />
+        <input type="number" id="c-k" placeholder="K%" step="0.01" />
+        <input type="number" id="c-mg" placeholder="Mg%" step="0.01" />
+        <input type="number" id="c-ca" placeholder="Ca%" step="0.01" />
+      </div>
+      <button id="btn-salva-concime" class="btn btn-add" onclick="salvaConcime()">+ Aggiungi concime</button>
+      <button id="btn-annulla-concime" class="btn btn-light" onclick="annullaModificaConcime()" style="display:none;">Annulla modifica</button>
+    </div>
+
+    <div id="tab-backup" class="card">
+      <h3>Backup dati</h3>
+      <div class="notice">I dati ora si sincronizzano con Google Sheets. Ti consiglio comunque di scaricare ogni tanto un backup di sicurezza.</div>
+      <button class="btn btn-primary" onclick="scaricaBackup()">Scarica backup dati</button>
+      <label>Ripristina da backup</label>
+      <input type="file" id="file-backup" accept="application/json" onchange="ripristinaBackup(event)" />
+      <button class="btn btn-danger" onclick="cancellaTutto()">Cancella tutti i dati</button>
+      <p style="font-size:12px;color:#607d8b;">I dati vengono salvati anche sul dispositivo come copia locale e sincronizzati con Google Sheets quando il collegamento funziona.</p>
+    </div>
+  </div>
+
+<script>
+const STORAGE_KEY = 'registro_vigna_v5';
+const CLOUD_URL = 'https://script.google.com/macros/s/AKfycbyD99lKWrMKJkIgvpt9b5UE15x2vAzTPgdlRU5vHmBPro47I_4ARnQtPHsygogajzWXFA/exec';
+let data = caricaDati();
+let miscela = [];
+let editVignetoId = null;
+let editConcimeId = null;
+let editInterventoId = null;
+let syncTimer = null;
+let cloudPronto = false;
+
+function datiVuoti(d) {
+  return !d || (!Array.isArray(d.vigneti) || d.vigneti.length === 0) && (!Array.isArray(d.concimi) || d.concimi.length === 0) && (!Array.isArray(d.registro) || d.registro.length === 0);
+}
+
+function normalizzaDati(d) {
+  return {
+    vigneti: Array.isArray(d && d.vigneti) ? d.vigneti : [],
+    concimi: Array.isArray(d && d.concimi) ? d.concimi : [],
+    registro: Array.isArray(d && d.registro) ? d.registro : []
+  };
+}
+
+function caricaDati() {
+  try {
+    return normalizzaDati(JSON.parse(localStorage.getItem(STORAGE_KEY)) || { vigneti: [], concimi: [], registro: [] });
+  } catch(e) {
+    return { vigneti: [], concimi: [], registro: [] };
+  }
+}
+
+function salvaStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function setSyncStatus(testo, tipo = '') {
+  const status = document.getElementById('sync-status');
+  const dot = document.getElementById('sync-dot');
+  if (!status || !dot) return;
+  status.innerText = testo;
+  dot.className = 'sync-dot' + (tipo ? ' ' + tipo : '');
+}
+
+function caricaDaCloud() {
+  return new Promise((resolve, reject) => {
+    const cbName = 'registroCloudCallback_' + Date.now();
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Tempo scaduto'));
+    }, 15000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = (res) => {
+      cleanup();
+      if (res && res.ok) resolve(normalizzaDati(res.data));
+      else reject(new Error('Risposta cloud non valida'));
+    };
+
+    script.onerror = () => { cleanup(); reject(new Error('Errore collegamento cloud')); };
+    script.src = CLOUD_URL + '?callback=' + encodeURIComponent(cbName) + '&t=' + Date.now();
+    document.body.appendChild(script);
+  });
+}
+
+async function salvaSuCloud() {
+  try {
+    setSyncStatus('Sincronizzazione in corso...', 'warn');
+    await fetch(CLOUD_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ data })
+    });
+    setSyncStatus('Sincronizzato con Google Sheets', 'ok');
+  } catch(e) {
+    setSyncStatus('Non sincronizzato: dati salvati su questo dispositivo', 'err');
+  }
+}
+
+function pianificaSyncCloud() {
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => salvaSuCloud(), 700);
+}
+
+function save() {
+  salvaStorage();
+  render();
+  pianificaSyncCloud();
+}
+
+async function avviaCloud() {
+  setSyncStatus('Collegamento a Google Sheets...', 'warn');
+  const datiLocali = caricaDati();
+  try {
+    const datiCloud = await caricaDaCloud();
+    cloudPronto = true;
+
+    if (datiVuoti(datiCloud) && !datiVuoti(datiLocali)) {
+      data = datiLocali;
+      salvaStorage();
+      render();
+      await salvaSuCloud();
+      setSyncStatus('Dati locali caricati su Google Sheets', 'ok');
+      return;
+    }
+
+    if (!datiVuoti(datiCloud)) {
+      data = datiCloud;
+      salvaStorage();
+      render();
+      setSyncStatus('Dati caricati da Google Sheets', 'ok');
+      return;
+    }
+
+    data = datiLocali;
+    render();
+    setSyncStatus('Google Sheets collegato, registro vuoto', 'ok');
+  } catch(e) {
+    cloudPronto = false;
+    data = datiLocali;
+    render();
+    setSyncStatus('Cloud non raggiungibile: uso dati del dispositivo', 'err');
+  }
+}
+
+async function forzaSincronizzazione() {
+  salvaStorage();
+  await salvaSuCloud();
+  alert('Sincronizzazione inviata. Apri o aggiorna l’altro dispositivo per vedere i dati.');
+}
+
+function oggiISO() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0,10);
+}
+
+function dataIt(iso) {
+  if (!iso) return new Date().toLocaleDateString('it-IT');
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function openTab(id) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const btn = document.getElementById('btn-' + id);
+  if (btn) btn.classList.add('active');
+  if (id === 'tab-new') ricalcolaArea();
+}
+
+function salvaVigneto() {
+  const nome = document.getElementById('v-nome').value.trim();
+  const ha = parseFloat(document.getElementById('v-ha').value);
+  if (!nome || !ha || ha <= 0) return alert('Inserisci nome campo ed ettari validi.');
+  if (editVignetoId !== null) {
+    const v = data.vigneti.find(x => String(x.id) === String(editVignetoId));
+    if (v) { v.nome = nome; v.ha = ha; }
+    annullaModificaVigneto(false);
+  } else {
+    data.vigneti.push({ id: Date.now(), nome, ha });
+  }
+  document.getElementById('v-nome').value = '';
+  document.getElementById('v-ha').value = '';
+  save();
+}
+
+function modificaVigneto(id) {
+  const v = data.vigneti.find(x => String(x.id) === String(id));
+  if (!v) return;
+  editVignetoId = id;
+  document.getElementById('v-nome').value = v.nome;
+  document.getElementById('v-ha').value = v.ha;
+  document.getElementById('btn-salva-vigneto').innerText = 'Salva modifica campo';
+  document.getElementById('btn-annulla-vigneto').style.display = 'block';
+  openTab('tab-fields');
+}
+
+function annullaModificaVigneto(pulisci = true) {
+  editVignetoId = null;
+  document.getElementById('btn-salva-vigneto').innerText = '+ Aggiungi campo';
+  document.getElementById('btn-annulla-vigneto').style.display = 'none';
+  if (pulisci) {
+    document.getElementById('v-nome').value = '';
+    document.getElementById('v-ha').value = '';
+  }
+}
+
+function eliminaVigneto(id) {
+  if (!confirm('Eliminare questo campo?')) return;
+  data.vigneti = data.vigneti.filter(v => String(v.id) !== String(id));
+  if (String(editVignetoId) === String(id)) annullaModificaVigneto();
+  save();
+}
+
+function salvaConcime() {
+  const nome = document.getElementById('c-nome').value.trim();
+  if (!nome) return alert('Inserisci il nome del concime.');
+  const nuovo = {
+    nome,
+    n: parseFloat(document.getElementById('c-n').value) || 0,
+    p: parseFloat(document.getElementById('c-p').value) || 0,
+    k: parseFloat(document.getElementById('c-k').value) || 0,
+    mg: parseFloat(document.getElementById('c-mg').value) || 0,
+    ca: parseFloat(document.getElementById('c-ca').value) || 0
+  };
+  if (editConcimeId !== null) {
+    const c = data.concimi.find(x => String(x.id) === String(editConcimeId));
+    if (c) Object.assign(c, nuovo);
+    annullaModificaConcime(false);
+  } else {
+    data.concimi.push({ id: Date.now(), ...nuovo });
+  }
+  ['c-nome','c-n','c-p','c-k','c-mg','c-ca'].forEach(id => document.getElementById(id).value = '');
+  save();
+}
+
+function modificaConcime(id) {
+  const c = data.concimi.find(x => String(x.id) === String(id));
+  if (!c) return;
+  editConcimeId = id;
+  document.getElementById('c-nome').value = c.nome;
+  document.getElementById('c-n').value = c.n || 0;
+  document.getElementById('c-p').value = c.p || 0;
+  document.getElementById('c-k').value = c.k || 0;
+  document.getElementById('c-mg').value = c.mg || 0;
+  document.getElementById('c-ca').value = c.ca || 0;
+  document.getElementById('btn-salva-concime').innerText = 'Salva modifica concime';
+  document.getElementById('btn-annulla-concime').style.display = 'block';
+  openTab('tab-stock');
+}
+
+function annullaModificaConcime(pulisci = true) {
+  editConcimeId = null;
+  document.getElementById('btn-salva-concime').innerText = '+ Aggiungi concime';
+  document.getElementById('btn-annulla-concime').style.display = 'none';
+  if (pulisci) ['c-nome','c-n','c-p','c-k','c-mg','c-ca'].forEach(id => document.getElementById(id).value = '');
+}
+
+function eliminaConcime(id) {
+  if (!confirm('Eliminare questo concime?')) return;
+  data.concimi = data.concimi.filter(c => String(c.id) !== String(id));
+  if (String(editConcimeId) === String(id)) annullaModificaConcime();
+  save();
+}
+
+function ricalcolaArea() {
+  let a = 0;
+  document.querySelectorAll('.v-chk:checked').forEach(c => {
+    const v = data.vigneti.find(x => String(x.id) === String(c.value));
+    if (v) a += Number(v.ha) || 0;
+  });
+  document.getElementById('tot-area-info').innerText = 'Area: ' + a.toFixed(2) + ' ha';
+  aggiornaDoseDaKgTotale();
+  updateMixUI();
+  return a;
+}
+
+function areaSelezionata() {
+  return Array.from(document.querySelectorAll('.v-chk:checked')).reduce((sum, c) => {
+    const v = data.vigneti.find(x => String(x.id) === String(c.value));
+    return sum + (v ? Number(v.ha) || 0 : 0);
+  }, 0);
+}
+
+function aggiornaDoseDaKgTotale() {
+  const area = areaSelezionata();
+  const kgTot = parseFloat(document.getElementById('in-kg-tot').value);
+  if (area > 0 && kgTot > 0) {
+    document.getElementById('in-dose-ha').value = (kgTot / area).toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+  }
+}
+
+function aggiornaKgTotaleDaDose() {
+  const area = areaSelezionata();
+  const dose = parseFloat(document.getElementById('in-dose-ha').value);
+  const kgTotInput = document.getElementById('in-kg-tot');
+  if (area > 0 && dose > 0 && !kgTotInput.dataset.manuale) {
+    kgTotInput.value = (dose * area).toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+  }
+}
+
+function aggiungiAMiscela() {
+  const cId = document.getElementById('sel-concime').value;
+  const area = areaSelezionata();
+  let dose = parseFloat(document.getElementById('in-dose-ha').value);
+  const kgTotInseriti = parseFloat(document.getElementById('in-kg-tot').value);
+  if (!data.concimi.length) return alert('Prima inserisci almeno un concime nel magazzino.');
+  if ((!dose || dose <= 0) && kgTotInseriti > 0 && area > 0) dose = kgTotInseriti / area;
+  if (!dose || dose <= 0 || !cId) return alert('Inserisci una dose valida o i kg totali usati.');
+  const c = data.concimi.find(x => String(x.id) === String(cId));
+  if (!c) return;
+  const totaleKg = kgTotInseriti > 0 ? kgTotInseriti : (area > 0 ? dose * area : 0);
+  miscela.push({
+    nome: c.nome,
+    dose,
+    totaleKg,
+    un: dose * (Number(c.n) || 0) / 100,
+    up: dose * (Number(c.p) || 0) / 100,
+    uk: dose * (Number(c.k) || 0) / 100,
+    umg: dose * (Number(c.mg) || 0) / 100,
+    uca: dose * (Number(c.ca) || 0) / 100
+  });
+  document.getElementById('in-dose-ha').value = '';
+  document.getElementById('in-kg-tot').value = '';
+  updateMixUI();
+}
+
+function updateMixUI() {
+  const box = document.getElementById('box-miscela');
+  const area = areaSelezionata();
+
+  box.style.display = miscela.length ? 'block' : 'none';
+  document.getElementById('lista-miscela').innerHTML = miscela.map((m, i) => {
+    const kgTot = Number(m.totaleKg) > 0 ? Number(m.totaleKg) : (area > 0 ? m.dose * area : 0);
+    const totaleKg = kgTot > 0 ? ` — totale ${kgTot.toFixed(1)} kg` : '';
+    return `<div class="mix-item"><div><b>${escapeHtml(m.nome)}</b><br><small>${Number(m.dose).toFixed(3).replace(/0+$/,'').replace(/\.$/,'')} kg/ha${totaleKg}</small></div><div class="actions"><button class="btn btn-edit btn-small" onclick="modificaMiscela(${i})">Modifica</button><button class="btn btn-danger btn-small" onclick="rimuoviMiscela(${i})">Elimina</button></div></div>`;
+  }).join('');
+
+  let tn=0, tp=0, tk=0, tmg=0, tca=0;
+  miscela.forEach(m => { tn+=m.un; tp+=m.up; tk+=m.uk; tmg+=m.umg || 0; tca+=m.uca || 0; });
+  document.getElementById('val-n').innerText = tn.toFixed(1);
+  document.getElementById('val-p').innerText = tp.toFixed(1);
+  document.getElementById('val-k').innerText = tk.toFixed(1);
+  document.getElementById('val-mg').innerText = tmg.toFixed(1);
+  document.getElementById('val-ca').innerText = tca.toFixed(1);
+}
+
+function modificaMiscela(i) {
+  const m = miscela[i];
+  if (!m) return;
+  const area = areaSelezionata();
+  const concime = data.concimi.find(c => String(c.nome).trim().toLowerCase() === String(m.nome).trim().toLowerCase());
+  if (concime) document.getElementById('sel-concime').value = concime.id;
+  document.getElementById('in-dose-ha').value = Number(m.dose || 0).toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+  const kgTot = Number(m.totaleKg) > 0 ? Number(m.totaleKg) : (area > 0 ? Number(m.dose || 0) * area : 0);
+  document.getElementById('in-kg-tot').value = kgTot > 0 ? kgTot.toFixed(2).replace(/0+$/,'').replace(/\.$/,'') : '';
+  miscela.splice(i, 1);
+  updateMixUI();
+  const box = document.querySelector('.box-soft');
+  if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function rimuoviMiscela(i) {
+  miscela.splice(i, 1);
+  updateMixUI();
+}
+
+function salvaIntervento() {
+  const checks = Array.from(document.querySelectorAll('.v-chk:checked'));
+  const vigne = checks.map(x => data.vigneti.find(v => String(v.id) === String(x.value))).filter(Boolean);
+  const area = vigne.reduce((s, v) => s + (Number(v.ha)||0), 0);
+  if (!vigne.length || !miscela.length) return alert('Seleziona almeno un vigneto e inserisci almeno un prodotto.');
+  const intervento = {
+    id: editInterventoId !== null ? editInterventoId : Date.now(),
+    dataISO: document.getElementById('in-data').value || oggiISO(),
+    data: dataIt(document.getElementById('in-data').value || oggiISO()),
+    vIds: vigne.map(v => v.id),
+    vigne: vigne.map(v => v.nome).join(', '),
+    area,
+    metodo: document.getElementById('sel-metodo').value,
+    prodotti: miscela.map(m => ({...m, totaleKg: Number(m.totaleKg) > 0 ? Number(m.totaleKg) : m.dose * area})),
+    n: document.getElementById('val-n').innerText,
+    p: document.getElementById('val-p').innerText,
+    k: document.getElementById('val-k').innerText,
+    mg: document.getElementById('val-mg').innerText,
+    ca: document.getElementById('val-ca').innerText,
+    note: document.getElementById('in-note').value.trim()
+  };
+  if (editInterventoId !== null) {
+    const idx = data.registro.findIndex(r => String(r.id) === String(editInterventoId));
+    if (idx >= 0) data.registro[idx] = intervento;
+    annullaModificaIntervento(false);
+  } else {
+    data.registro.unshift(intervento);
+  }
+  miscela = [];
+  document.getElementById('in-note').value = '';
+  document.getElementById('in-data').value = oggiISO();
+  document.querySelectorAll('.v-chk').forEach(c => c.checked = false);
+  updateMixUI();
+  save();
+  openTab('tab-history');
+}
+
+function modificaIntervento(id) {
+  const r = data.registro.find(x => String(x.id) === String(id));
+  if (!r) return;
+  editInterventoId = id;
+  openTab('tab-new');
+  document.getElementById('in-data').value = r.dataISO || oggiISO();
+  document.getElementById('sel-metodo').value = r.metodo || 'Spandiconcime';
+  document.getElementById('in-note').value = r.note || '';
+  const ids = (r.vIds || []).map(String);
+  const nomi = String(r.vigne || '').split(',').map(x => x.trim());
+  document.querySelectorAll('.v-chk').forEach(chk => {
+    const v = data.vigneti.find(x => String(x.id) === String(chk.value));
+    chk.checked = ids.includes(String(chk.value)) || (v && nomi.includes(v.nome));
+  });
+  miscela = (r.prodotti || []).map(p => ({
+    nome: p.nome,
+    dose: Number(p.dose) || 0,
+    un: Number(p.un) || 0,
+    up: Number(p.up) || 0,
+    uk: Number(p.uk) || 0,
+    umg: Number(p.umg) || 0,
+    uca: Number(p.uca) || 0,
+    totaleKg: Number(p.totaleKg) || 0
+  }));
+  document.getElementById('btn-salva-intervento').innerText = 'Salva modifica intervento';
+  document.getElementById('btn-annulla-intervento').style.display = 'block';
+  document.getElementById('edit-intervento-banner').style.display = 'block';
+  ricalcolaArea();
+  updateMixUI();
+}
+
+function annullaModificaIntervento(pulisci = true) {
+  editInterventoId = null;
+  document.getElementById('btn-salva-intervento').innerText = 'Salva nel registro';
+  document.getElementById('btn-annulla-intervento').style.display = 'none';
+  document.getElementById('edit-intervento-banner').style.display = 'none';
+  if (pulisci) {
+    miscela = [];
+    document.getElementById('in-note').value = '';
+    document.getElementById('in-data').value = oggiISO();
+    document.querySelectorAll('.v-chk').forEach(c => c.checked = false);
+    updateMixUI();
+  }
+}
+
+function eliminaIntervento(id) {
+  if (!confirm('Eliminare questo intervento dal registro?')) return;
+  data.registro = data.registro.filter(r => String(r.id) !== String(id));
+  if (String(editInterventoId) === String(id)) annullaModificaIntervento();
+  save();
+}
+
+function scaricaFile(nome, contenuto, tipo) {
+  const blob = new Blob([contenuto], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function scaricaBackup() {
+  const nome = `backup-registro-vigna-${oggiISO()}.json`;
+  scaricaFile(nome, JSON.stringify(data, null, 2), 'application/json');
+}
+
+function ripristinaBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.vigneti || !imported.concimi || !imported.registro) throw new Error('Formato non valido');
+      if (!confirm('Ripristinare questo backup? I dati attuali saranno sostituiti.')) return;
+      data = imported;
+      save();
+      alert('Backup ripristinato.');
+    } catch(err) {
+      alert('File backup non valido.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function numero(v) {
+  return parseFloat(String(v ?? 0).replace(',', '.')) || 0;
+}
+
+function idsCampiIntervento(r) {
+  if (Array.isArray(r.vIds) && r.vIds.length) return r.vIds.map(String);
+  const nomi = String(r.vigne || '').split(',').map(x => x.trim()).filter(Boolean);
+  return data.vigneti.filter(v => nomi.includes(v.nome)).map(v => String(v.id));
+}
+
+function calcolaTotaliPerCampo() {
+  const totals = {};
+  data.vigneti.forEach(v => {
+    totals[String(v.id)] = {
+      id: String(v.id), nome: v.nome, ha: Number(v.ha) || 0, interventi: 0,
+      n: 0, p: 0, k: 0, mg: 0, ca: 0,
+      nKg: 0, pKg: 0, kKg: 0, mgKg: 0, caKg: 0
+    };
+  });
+
+  data.registro.forEach(r => {
+    const ids = idsCampiIntervento(r);
+    ids.forEach(id => {
+      const t = totals[String(id)];
+      if (!t) return;
+      const n = numero(r.n), p = numero(r.p), k = numero(r.k), mg = numero(r.mg), ca = numero(r.ca);
+      t.interventi += 1;
+      t.n += n; t.p += p; t.k += k; t.mg += mg; t.ca += ca;
+      t.nKg += n * t.ha; t.pKg += p * t.ha; t.kKg += k * t.ha; t.mgKg += mg * t.ha; t.caKg += ca * t.ha;
+    });
+  });
+  return Object.values(totals);
+}
+
+function esportaTotaliCampiCSV() {
+  const rows = [['Campo','Ettari','Interventi','N unità/ha','P unità/ha','K unità/ha','Mg unità/ha','Ca unità/ha','N kg totali','P kg totali','K kg totali','Mg kg totali','Ca kg totali']];
+  calcolaTotaliPerCampo().forEach(t => {
+    rows.push([
+      t.nome,
+      t.ha.toFixed(2),
+      t.interventi,
+      t.n.toFixed(1), t.p.toFixed(1), t.k.toFixed(1), t.mg.toFixed(1), t.ca.toFixed(1),
+      t.nKg.toFixed(1), t.pKg.toFixed(1), t.kKg.toFixed(1), t.mgKg.toFixed(1), t.caKg.toFixed(1)
+    ]);
+  });
+  const csv = rows.map(row => row.map(v => '"' + String(v ?? '').replaceAll('"','""') + '"').join(';')).join('\n');
+  scaricaFile(`totali-campi-vigna-${oggiISO()}.csv`, csv, 'text/csv;charset=utf-8');
+}
+
+function esportaCSV() {
+  const rows = [['Data','Vigneti','Area ha','Metodo','Prodotti','N/ha','P/ha','K/ha','Mg/ha','Ca/ha','Note']];
+  data.registro.forEach(r => {
+    rows.push([
+      r.data,
+      r.vigne,
+      Number(r.area || 0).toFixed(2),
+      r.metodo,
+      (r.prodotti || []).map(p => `${p.nome} ${p.dose} kg/ha tot ${Number(p.totaleKg || 0).toFixed(1)} kg`).join(' | '),
+      r.n, r.p, r.k, r.mg || 0, r.ca || 0, r.note || ''
+    ]);
+  });
+  const csv = rows.map(row => row.map(v => '"' + String(v ?? '').replaceAll('"','""') + '"').join(';')).join('\n');
+  scaricaFile(`registro-vigna-${oggiISO()}.csv`, csv, 'text/csv;charset=utf-8');
+}
+
+function cancellaTutto() {
+  if (!confirm('Vuoi davvero cancellare tutti i dati? Prima fai un backup.')) return;
+  if (!confirm('Confermi cancellazione definitiva?')) return;
+  data = { vigneti: [], concimi: [], registro: [] };
+  miscela = [];
+  save();
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>'"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s]));
+}
+
+
+function testoInterventoWhatsApp(r) {
+  const prodotti = (r.prodotti || []).map(p => {
+    const kgHa = Number(p.dose || 0).toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+    const kgTot = Number(p.totaleKg || 0).toFixed(1);
+    return `- ${p.nome}: ${kgTot} kg totali (${kgHa} kg/ha)`;
+  }).join('\n');
+
+  return [
+    'ORDINE CONCIMAZIONE',
+    '',
+    `Data: ${r.data || ''}`,
+    `Campi: ${r.vigne || ''}`,
+    `Area totale: ${Number(r.area || 0).toFixed(2)} ha`,
+    `Metodo: ${r.metodo || ''}`,
+    '',
+    'CONCIMI DA USARE:',
+    prodotti || '- Nessun prodotto',
+    '',
+    'UNITÀ / HA:',
+    `N: ${r.n || 0}   P: ${r.p || 0}   K: ${r.k || 0}   Mg: ${r.mg || 0}   Ca: ${r.ca || 0}`,
+    r.note ? '' : null,
+    r.note ? `NOTE: ${r.note}` : null
+  ].filter(x => x !== null).join('\n');
+}
+
+function nomeFileIntervento(r) {
+  const dataPulita = String(r.data || oggiISO()).replaceAll('/','-').replaceAll(' ','_');
+  const campi = String(r.vigne || 'campi').replace(/[^a-zA-Z0-9àèéìòùÀÈÉÌÒÙ_-]+/g, '_').slice(0, 35);
+  return `ordine_concimazione_${dataPulita}_${campi}.txt`;
+}
+
+async function condividiInterventoWhatsApp(id) {
+  const r = data.registro.find(x => String(x.id) === String(id));
+  if (!r) return alert('Intervento non trovato.');
+
+  const testo = testoInterventoWhatsApp(r);
+  const nome = nomeFileIntervento(r);
+
+  try {
+    const file = new File([testo], nome, { type: 'text/plain' });
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      await navigator.share({
+        title: 'Ordine concimazione',
+        text: 'Ordine concimazione da eseguire.',
+        files: [file]
+      });
+      return;
+    }
+
+    if (navigator.share) {
+      await navigator.share({
+        title: 'Ordine concimazione',
+        text: testo
+      });
+      return;
+    }
+  } catch (e) {
+    if (String(e && e.name) === 'AbortError') return;
+  }
+
+  scaricaFile(nome, testo, 'text/plain;charset=utf-8');
+  alert('Ho creato il file TXT. Puoi inviarlo con WhatsApp come allegato.');
+}
+
+function stampaIntervento(id) {
+  const r = data.registro.find(x => String(x.id) === String(id));
+  if (!r) return alert('Intervento non trovato.');
+  const prodotti = (r.prodotti || []).map(p => `
+    <tr>
+      <td>${escapeHtml(p.nome)}</td>
+      <td class="num">${Number(p.totaleKg || 0).toFixed(1)} kg</td>
+      <td class="num">${Number(p.dose || 0).toFixed(3).replace(/0+$/,'').replace(/\.$/,'')} kg/ha</td>
+    </tr>`).join('');
+  const html = `<!DOCTYPE html>
+<html lang="it"><head><meta charset="UTF-8"><title>Intervento ${escapeHtml(r.data)}</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:28px;color:#222;}
+  h1{font-size:22px;margin:0 0 6px;} h2{font-size:16px;margin:18px 0 8px;}
+  .box{border:1px solid #ddd;border-radius:10px;padding:14px;margin:12px 0;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;}
+  table{width:100%;border-collapse:collapse;margin-top:8px;} th,td{border-bottom:1px solid #ddd;padding:9px;text-align:left;} th{background:#f1f8e9;} .num{text-align:right;font-weight:bold;}
+  .tags span{display:inline-block;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;padding:6px 8px;margin:3px;font-weight:bold;}
+  .small{color:#666;font-size:12px;} .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.btnprint,.btnback{padding:10px 16px;border:0;border-radius:8px;color:white;font-weight:bold;cursor:pointer}.btnprint{background:#1b5e20}.btnback{background:#555}@media print{button,.topbar{display:none} body{margin:18px}}
+</style></head><body>
+<div class="topbar"><button class="btnback" onclick="try{window.close()}catch(e){}; setTimeout(function(){ if(!window.closed){ location.href=window.opener ? 'about:blank' : '/'; } },150);">← Torna al registro</button><button class="btnprint" onclick="window.print()">Stampa</button></div>
+<h1>Ordine intervento concimazione</h1>
+<div class="small">Da consegnare agli operatori / dipendenti</div>
+<div class="box grid">
+  <div><b>Data:</b> ${escapeHtml(r.data)}</div>
+  <div><b>Metodo:</b> ${escapeHtml(r.metodo)}</div>
+  <div><b>Campi:</b> ${escapeHtml(r.vigne)}</div>
+  <div><b>Area totale:</b> ${Number(r.area || 0).toFixed(2)} ha</div>
+</div>
+<h2>Concimi da distribuire</h2>
+<table><thead><tr><th>Prodotto</th><th class="num">Kg totali da usare</th><th class="num">Kg/ha</th></tr></thead><tbody>${prodotti}</tbody></table>
+<h2>Unità totali / ha</h2>
+<div class="tags"><span>N: ${escapeHtml(r.n)}</span><span>P: ${escapeHtml(r.p)}</span><span>K: ${escapeHtml(r.k)}</span><span>Mg: ${escapeHtml(r.mg || 0)}</span><span>Ca: ${escapeHtml(r.ca || 0)}</span></div>
+${r.note ? `<h2>Note</h2><div class="box">${escapeHtml(r.note)}</div>` : ''}
+</body></html>`;
+  const w = window.open('', '_blank');
+  if (!w) return alert('Il browser ha bloccato la finestra di stampa. Consenti i popup per questo sito.');
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+
+function render() {
+  document.getElementById('list-selezione-vigne').innerHTML = data.vigneti.length ? data.vigneti.map(v => `<label class="selector-item"><input type="checkbox" class="v-chk" value="${v.id}" onchange="ricalcolaArea()"> ${escapeHtml(v.nome)} (${Number(v.ha).toFixed(2)} ha)</label>`).join('') : '<div class="empty">Prima aggiungi i campi nella sezione CAMPI.</div>';
+
+  document.getElementById('sel-concime').innerHTML = data.concimi.length ? data.concimi.map(c => `<option value="${c.id}">${escapeHtml(c.nome)} — N ${c.n}% P ${c.p}% K ${c.k}% Mg ${c.mg || 0}% Ca ${c.ca || 0}%</option>`).join('') : '<option value="">Nessun concime inserito</option>';
+
+  document.getElementById('display-vigneti').innerHTML = data.vigneti.length ? data.vigneti.map(v => `<div class="row-item"><div><b>${escapeHtml(v.nome)}</b><br><small>${Number(v.ha).toFixed(2)} ha</small></div><div class="actions"><button class="btn btn-edit btn-small" onclick="modificaVigneto(${v.id})">Modifica</button><button class="btn btn-danger btn-small" onclick="eliminaVigneto(${v.id})">Elimina</button></div></div>`).join('') : '<div class="empty">Nessun campo inserito.</div>';
+
+  document.getElementById('display-concimi').innerHTML = data.concimi.length ? data.concimi.map(c => `<div class="row-item"><div><b>${escapeHtml(c.nome)}</b><br><small>N:${c.n}% P:${c.p}% K:${c.k}% Mg:${c.mg || 0}% Ca:${c.ca || 0}%</small></div><div class="actions"><button class="btn btn-edit btn-small" onclick="modificaConcime(${c.id})">Modifica</button><button class="btn btn-danger btn-small" onclick="eliminaConcime(${c.id})">Elimina</button></div></div>`).join('') : '<div class="empty">Nessun concime inserito.</div>';
+
+  const totaliCampi = calcolaTotaliPerCampo();
+  document.getElementById('display-totali-campi').innerHTML = data.registro.length ? `
+    <div class="summary-box">
+      <h4 class="summary-title">Totali unità concime per campo</h4>
+      <small>Somma delle unità/ha registrate su ogni campo. Tra parentesi trovi i kg totali di elemento sul campo.</small>
+      ${totaliCampi.map(t => `
+        <div class="summary-row">
+          <b>${escapeHtml(t.nome)}</b> <small>— ${t.ha.toFixed(2)} ha — ${t.interventi} interventi</small>
+          <div class="summary-tags">
+            <span class="tag">N: ${t.n.toFixed(1)} u/ha (${t.nKg.toFixed(1)} kg)</span>
+            <span class="tag">P: ${t.p.toFixed(1)} u/ha (${t.pKg.toFixed(1)} kg)</span>
+            <span class="tag">K: ${t.k.toFixed(1)} u/ha (${t.kKg.toFixed(1)} kg)</span>
+            <span class="tag">Mg: ${t.mg.toFixed(1)} u/ha (${t.mgKg.toFixed(1)} kg)</span>
+            <span class="tag">Ca: ${t.ca.toFixed(1)} u/ha (${t.caKg.toFixed(1)} kg)</span>
+          </div>
+        </div>`).join('')}
+    </div>` : '<div class="empty">I totali per campo compariranno dopo il primo intervento registrato.</div>';
+
+  document.getElementById('display-registro').innerHTML = data.registro.length ? data.registro.map(r => `
+    <div class="history-item">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+        <div><small>${escapeHtml(r.data)}</small><br><b>${escapeHtml(r.vigne)}</b><br><small>Area: ${Number(r.area || 0).toFixed(2)} ha</small></div>
+        <div class="actions"><button class="btn btn-light btn-small" onclick="stampaIntervento(${r.id})">Stampa</button><button class="btn btn-light btn-small" onclick="condividiInterventoWhatsApp(${r.id})">WhatsApp</button><button class="btn btn-edit btn-small" onclick="modificaIntervento(${r.id})">Modifica</button><button class="btn btn-danger btn-small" onclick="eliminaIntervento(${r.id})">Elimina</button></div>
+      </div>
+      <span class="tag tag-method">${escapeHtml(r.metodo)}</span><br>
+      ${(r.prodotti || []).map(p => `• ${escapeHtml(p.nome)}: ${p.dose} kg/ha — totale ${Number(p.totaleKg || 0).toFixed(1)} kg`).join('<br>')}
+      <div style="margin-top:8px;"><span class="tag">N: ${r.n}</span><span class="tag">P: ${r.p}</span><span class="tag">K: ${r.k}</span><span class="tag">Mg: ${r.mg || 0}</span><span class="tag">Ca: ${r.ca || 0}</span></div>
+      ${r.note ? `<p style="margin-bottom:0;"><b>Note:</b> ${escapeHtml(r.note)}</p>` : ''}
+    </div>`).join('') : '<div class="empty">Nessun intervento registrato.</div>';
+
+  ricalcolaArea();
+}
+
+window.onload = () => {
+  document.getElementById('in-data').value = oggiISO();
+  render();
+  avviaCloud();
+};
+</script>
+</body>
+</html>
