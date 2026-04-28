@@ -349,12 +349,6 @@ async function forzaSincronizzazione() {
   alert('Sincronizzazione inviata. Apri o aggiorna l’altro dispositivo per vedere i dati.');
 }
 
-function confermaEliminazione(testo) {
-  return confirm(testo + '
-
-Confermi di voler eliminare?');
-}
-
 function oggiISO() {
   const d = new Date();
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -414,7 +408,7 @@ function annullaModificaVigneto(pulisci = true) {
 }
 
 function eliminaVigneto(id) {
-  if (!confermaEliminazione('Stai eliminando questo campo/vigneto.')) return;
+  if (!confirm('Eliminare questo campo?')) return;
   data.vigneti = data.vigneti.filter(v => String(v.id) !== String(id));
   campiSelezionati.delete(String(id));
   if (String(editVignetoId) === String(id)) annullaModificaVigneto();
@@ -466,7 +460,7 @@ function annullaModificaConcime(pulisci = true) {
 }
 
 function eliminaConcime(id) {
-  if (!confermaEliminazione('Stai eliminando questo concime dal magazzino.')) return;
+  if (!confirm('Eliminare questo concime?')) return;
   data.concimi = data.concimi.filter(c => String(c.id) !== String(id));
   if (String(editConcimeId) === String(id)) annullaModificaConcime();
   save();
@@ -650,8 +644,6 @@ function modificaMiscela(i) {
 }
 
 function rimuoviMiscela(i) {
-  const nome = miscela[i] && miscela[i].nome ? miscela[i].nome : 'questo prodotto';
-  if (!confermaEliminazione('Stai eliminando ' + nome + ' dalla lista prodotti inseriti.')) return;
   miscela.splice(i, 1);
   updateMixUI();
 }
@@ -741,7 +733,7 @@ function annullaModificaIntervento(pulisci = true) {
 }
 
 function eliminaIntervento(id) {
-  if (!confermaEliminazione('Stai eliminando questo intervento dal registro.')) return;
+  if (!confirm('Eliminare questo intervento dal registro?')) return;
   data.registro = data.registro.filter(r => String(r.id) !== String(id));
   if (String(editInterventoId) === String(id)) annullaModificaIntervento();
   save();
